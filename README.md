@@ -1,34 +1,86 @@
-🏦 System-Bank-Web
-Sistema web de home banking desarrollado como proyecto académico, con funcionalidades para clientes y administradores, utilizando tecnologías Java, JSP, Servlets y JDBC.
+# System Bank Web
 
-📌 Características principales
-Inicio de sesión seguro con control de acceso basado en roles (RBAC)
+![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white)
+![GitHub stars](https://img.shields.io/github/stars/Juanlegall/System-Bank-web?style=social)
+![GitHub forks](https://img.shields.io/github/forks/Juanlegall/System-Bank-web?style=social)
 
-ABML de usuarios, cuentas y préstamos
+Este repositorio contiene el código fuente de un **Sistema de Home Banking** desarrollado como proyecto académico utilizando **Java**, **JSP**, **Servlets**, y **JDBC**. Permite la gestión completa de clientes, cuentas y movimientos bancarios, con funcionalidades diferenciadas por rol.
 
-Gestión de transferencias entre cuentas
+---
 
-Interfaz diferenciada para cliente y administrador
+## Tabla de Contenidos
 
-Validaciones en frontend y backend
+* [Características Principales](#características-principales)
+* [Tecnologías Utilizadas](#tecnologías-utilizadas)
+* [Requisitos del Sistema](#requisitos-del-sistema)
+* [Configuración](#configuración)
+    * [Clonado del Repositorio](#clonado-del-repositorio)
+    * [Configuración de la Base de Datos](#configuración-de-la-base-de-datos)
+    * [Configuración de la Aplicación](#configuración-de-la-aplicación)
+* [Ejecución de la Aplicación](#ejecución-de-la-aplicación)
+* [Uso](#uso)
+* [Contribución](#contribución)
+* [Licencia](#licencia)
+* [Autor](#autor)
 
-Uso de patrón MVC y modelo en capas
+---
 
-Paginación en listados de movimientos
+## Características Principales
 
-Gestión de sesiones y seguridad básica
+* **Inicio de sesión seguro con control de acceso basado en roles (RBAC):**
+    * Autenticación de usuarios y control de permisos según el tipo de cuenta (cliente o administrador).
+* **Gestión de Clientes y Administradores:**
+    * Alta, baja, modificación y listado (ABML).
+* **Gestión de Cuentas Bancarias:**
+    * Alta de cuentas, eliminación y actualizaciones.
+    * Vinculación de cuentas con clientes.
+* **Gestión de Transferencias:**
+    * Realización de transferencias entre cuentas con validaciones.
+    * Visualización de movimientos por cuenta.
+* **Gestión de Préstamos (opcional):**
+    * Alta y seguimiento de préstamos personales.
+* **Entornos diferenciados por rol:**
+    * Menú exclusivo para administradores.
+    * Funcionalidades personalizadas para clientes.
+* **Validaciones dinámicas en frontend y backend:**
+    * Validación de datos, campos obligatorios, restricciones por tipo de usuario, etc.
+* **Paginación de movimientos:**
+    * Visualización paginada de movimientos por cuenta (10 por página).
 
-🛠️ Tecnologías utilizadas
-Lenguaje: Java
+---
 
-Frontend: JSP, HTML, CSS, Bootstrap, Tailwind
+## Tecnologías Utilizadas
 
-Backend: Servlets, JDBC
+* **Lenguaje de Programación:** Java (JDK 17)
+* **Backend:**
+    * Servlets
+    * JDBC
+    * Modelo en capas
+* **Frontend:**
+    * JSP
+    * HTML
+    * CSS
+    * Bootstrap
+* **Base de Datos:** MySQL
+* **Servidor Web:** Apache Tomcat 10
+* **IDE:** Eclipse
+* **Control de versiones:** Git / GitHub
 
-Base de datos: MySQL
+---
 
-IDE: Eclipse
+## Requisitos del Sistema
 
-Servidor: Apache Tomcat 10
+* Java JDK 17 o superior  
+* Apache Tomcat 10  
+* MySQL Server  
+* Eclipse IDE (o compatible)  
+* Navegador Web moderno
 
-Control de versiones: Git & GitHub
+---
+
+## Configuración
+
+### Clonado del Repositorio
+
+```bash
+git clone https://github.com/Juanlegall/System-Bank-web.git
