@@ -15,14 +15,7 @@ Este repositorio contiene el código fuente de un **Sistema de Home Banking** de
 * [Requisitos del Sistema](#requisitos-del-sistema)
 * [Configuración](#configuración)
     * [Clonado del Repositorio](#clonado-del-repositorio)
-    * [Configuración de la Base de Datos](#configuración-de-la-base-de-datos)
-    * [Configuración de la Aplicación](#configuración-de-la-aplicación)
-* [Ejecución de la Aplicación](#ejecución-de-la-aplicación)
-* [Uso](#uso)
-* [Contribución](#contribución)
-* [Licencia](#licencia)
-* [Autor](#autor)
-
+   
 ---
 
 ## Características Principales
