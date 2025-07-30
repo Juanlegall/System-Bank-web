@@ -77,3 +77,29 @@ Este repositorio contiene el código fuente de un **Sistema de Home Banking** de
 
 ```bash
 git clone https://github.com/Juanlegall/System-Bank-web.git
+```
+### Configuración de la Base de Datos
+
+1. **Crear la base de datos:**
+   - Abrí **MySQL Workbench** u otro cliente de base de datos.
+   - Ejecutá el script `database.sql` ubicado en la carpeta `/scripts` del repositorio.
+   - Este script creará la base de datos y todas las tablas necesarias para el sistema.
+
+2. **Configurar los datos de conexión:**
+   - Ubicá el archivo `Conexion.java` dentro del paquete `src/utils/` o similar.
+   - Verificá y editá las siguientes variables según tu entorno local:
+
+     ```java
+     private static final String URL = "jdbc:mysql://localhost:3306/nombre_base_de_datos";
+     private static final String USER = "root";
+     private static final String PASSWORD = "tu_contraseña";
+     ```
+
+     > 🔁 Reemplazá `nombre_base_de_datos` con el nombre real usado en tu script, y `tu_contraseña` con tu clave de acceso a MySQL.
+
+3. **Agregar el conector JDBC de MySQL:**
+   - Asegurate de que el archivo `mysql-connector-j-8.0.x.jar` esté agregado al classpath del proyecto.
+   - En Eclipse:  
+     `Click derecho sobre el proyecto` → **Build Path** → **Add External Archives** → seleccionar el `.jar`.
+
+> ✅ ¡Una vez hecho esto, el sistema ya estará listo para ejecutarse en tu entorno local!
