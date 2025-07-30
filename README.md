@@ -82,20 +82,18 @@ git clone https://github.com/Juanlegall/System-Bank-web.git
 
 1. **Crear la base de datos:**
    - Abrí **MySQL Workbench** u otro cliente de base de datos.
-   - Ejecutá el script `database.sql` ubicado en la carpeta `/scripts` del repositorio.
+   - Ejecutá el script [ScriptBank]([https://www.ejemplo.com](https://github.com/Juanlegall/System-Bank-web/blob/master/Base%20de%20datos%20TpInt%20nuevo.txt)).
    - Este script creará la base de datos y todas las tablas necesarias para el sistema.
 
 2. **Configurar los datos de conexión:**
-   - Ubicá el archivo `Conexion.java` dentro del paquete `src/utils/` o similar.
+   - Ubicá el archivo `Conexion.java` dentro del paquete src/main/java/Interfaces/Conexion`
    - Verificá y editá las siguientes variables según tu entorno local:
 
      ```java
-     private static final String URL = "jdbc:mysql://localhost:3306/nombre_base_de_datos";
-     private static final String USER = "root";
-     private static final String PASSWORD = "tu_contraseña";
+    conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bancoparcial?useSSL=false", "tuUsuario", "tuContraseña");
      ```
 
-     > 🔁 Reemplazá `nombre_base_de_datos` con el nombre real usado en tu script, y `tu_contraseña` con tu clave de acceso a MySQL.
+     > 🔁 Reemplazá tu 'tuUsuario' y `tuContraseña` con tu clave de acceso a MySQL.
 
 3. **Agregar el conector JDBC de MySQL:**
    - Asegurate de que el archivo `mysql-connector-j-8.0.x.jar` esté agregado al classpath del proyecto.
