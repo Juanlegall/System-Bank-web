@@ -1,0 +1,443 @@
+DROP DATABASE BancoParcial;
+create schema BancoParcial;
+use BancoParcial;
+CREATE TABLE Pais (
+    IdPais INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE Provincia (
+    IdProvincia INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre VARCHAR(50) NOT NULL UNIQUE,
+    IdPais INT NOT NULL,
+CONSTRAINT Fk_IdPais FOREIGN KEY (IdPais) REFERENCES Pais(IdPais),
+ CONSTRAINT UQ_Nombre_IdPais UNIQUE (Nombre, IdPais)
+);
+
+CREATE TABLE Localidad (
+    IdLocalidad INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre VARCHAR(50) NOT NULL,
+    IdProvincia INT NOT NULL,
+    FOREIGN KEY (IdProvincia) REFERENCES Provincia(IdProvincia),
+    UNIQUE (Nombre, IdProvincia) -- Evita que se repita la localidad en la misma provincia
+);
+CREATE TABLE Persona (
+    Dni VARCHAR(11) PRIMARY KEY NOT NULL,
+    Cuil VARCHAR(22) UNIQUE NOT NULL,
+    Nombre VARCHAR(25) NOT NULL,
+    Apellido VARCHAR(25) NOT NULL,
+    Sexo VARCHAR(10) NOT NULL,
+    IdPais INT NOT NULL,
+    fechaNacimiento DATE NOT NULL,
+    Direccion VARCHAR(50) NOT NULL,
+    IdLocalidad INT NOT NULL,
+    IdProvincia INT NOT NULL,
+    Estado VARCHAR(15) NOT NULL DEFAULT 'Activo',
+    CorreoElectronico VARCHAR(50) UNIQUE NOT NULL,
+CONSTRAINT Fk_Persona_IdPais FOREIGN KEY (IdPais) REFERENCES Pais(IdPais),
+CONSTRAINT Fk_IdProvincia FOREIGN KEY (IdProvincia) REFERENCES Provincia(IdProvincia),
+CONSTRAINT Fk_IdLocalidad FOREIGn KEY (IdLocalidad) REFERENCES Localidad(IdLocalidad)
+);
+
+CREATE TABLE usuarios (
+    IdUsuario INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    NombreUsuario VARCHAR(25) UNIQUE NOT NULL,
+    Contraseña VARCHAR(25) NOT NULL,
+    dni VARCHAR(11) UNIQUE NOT NULL,
+    TipoUsuario BOOLEAN NOT NULL,
+    Estado VARCHAR(15) NOT NULL DEFAULT 'Activo',
+    CONSTRAINT Fk_Dni_Persona FOREIGN KEY (dni) REFERENCES Persona(Dni)
+);
+
+CREATE TABLE TelefonoxPersonas (
+    Dni VARCHAR(11) NOT NULL,
+    Telefono VARCHAR(11) NOT NULL,
+    Estado VARCHAR(15) NOT NULL DEFAULT 'Activo',
+    CONSTRAINT Pk_TelefonoxDni PRIMARY KEY (Dni, Telefono),
+    CONSTRAINT Fk_Dni FOREIGN KEY (Dni) REFERENCES Persona(Dni)
+);
+
+CREATE TABLE TipoCuenta (
+    idTipoCuenta INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    descripcion VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE Cuentas (
+    NroCuenta INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    IdUsuario INT NOT NULL,
+    FechaCreacion DATE NOT NULL,
+    IdtipoCuenta INT NOT NULL,
+    Cbu VARCHAR(22) UNIQUE NOT NULL,
+    Saldo DECIMAL(10,2) NOT NULL,
+    Estado VARCHAR(15) NOT NULL DEFAULT 'Activa',
+    CONSTRAINT Fk_IdUsuario FOREIGN KEY (IdUsuario) REFERENCES usuarios(IdUsuario),
+    CONSTRAINT Fk_TipoCuenta FOREIGN KEY (IdtipoCuenta) REFERENCES TipoCuenta(idTipoCuenta)
+);
+
+ 
+CREATE TABLE Prestamos (
+    IdPrestamo INT NOT NULL Auto_Increment Primary key,
+    IdUsuario INT NOT NULL,
+    Fecha DATE NOT NULL,
+    ImporteApagar DECIMAL(10,2) NOT NULL,
+    ImportePedido DECIMAL(10,2) NOT NULL,
+    PlazoDePago VARCHAR(25) NOT NULL,
+    MontoCuotasxMes DECIMAL(10,2) NOT NULL,
+    EstadoSolicitud VARCHAR(15) NOT NULL DEFAULT 'Pendiente',
+    EstadoPago VARCHAR(15) NOT NULL DEFAULT 'En curso',
+    IdCuenta INT NOT NULL,
+    CONSTRAINT FK_Prestamos_Usuario FOREIGN KEY (IdUsuario) REFERENCES usuarios(IdUsuario),
+    CONSTRAINT FK_Prestamos_Cuenta FOREIGN KEY (IdCuenta) REFERENCES Cuentas(NroCuenta)
+);
+CREATE TABLE TipoMovimiento (
+    IdTipoMovimiento INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    Descripcion VARCHAR(50) NOT NULL
+);
+CREATE TABLE Movimientos (
+    IdMovimiento INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    IdUsuario INT NOT NULL,
+    IdTipoMovimiento INT NOT NULL,
+    CuentaEmisor  INT NULL,
+    Detalle VARCHAR(50) NOT NULL,
+    Importe DECIMAL(10,2) NOT NULL,
+    Fecha DATE NOT NULL,
+    CuentaReceptor INT NULL,
+    Estado VARCHAR(15) NOT NULL DEFAULT 'Activo',
+    CONSTRAINT FK_Movimientos_Usuario FOREIGN KEY (IdUsuario) REFERENCES usuarios(IdUsuario),
+    CONSTRAINT FK_Movimientos_TipoMovimiento FOREIGN KEY (IdTipoMovimiento) REFERENCES TipoMovimiento(IdTipoMovimiento),
+     CONSTRAINT FK_Movimientos_CuentaReceptor FOREIGN KEY (CuentaReceptor) REFERENCES Cuentas(NroCuenta),
+     CONSTRAINT FK_Movimientos_CuentaEmisor FOREIGN KEY (CuentaEmisor) REFERENCES Cuentas(NroCuenta)
+);
+
+
+CREATE TABLE Cuotas (
+    IdCuota INT AUTO_INCREMENT PRIMARY KEY,
+    NroCuota INT NOT NULL,
+    Importe DECIMAL(15,2) NOT NULL,
+    FechaVencimiento DATE NOT NULL,
+    FechaPago DATE NULL,
+    IdPrestamo INT NOT NULL,
+    Estado VARCHAR(15) NOT NULL DEFAULT 'Activo',
+    FOREIGN KEY (IdPrestamo) REFERENCES Prestamos(IdPrestamo)
+);
+
+INSERT INTO TipoCuenta (descripcion) VALUES ('Caja de ahorro'), ('Cuenta corriente');
+
+INSERT INTO TipoMovimiento (Descripcion) VALUES
+('PagoPrestamo'),
+('AltaPrestamo'),
+('Transferencia'),
+('AltaCuenta');
+
+INSERT INTO pais (Nombre)
+VALUES ('Argentina'),
+('Chile'),
+('Uruguay');
+
+INSERT INTO Provincia (Nombre, IdPais) VALUES
+('Buenos Aires', 1),
+('Córdoba', 1),
+('Santa Fe', 1),
+('Mendoza', 1),
+('Salta', 1),
+('Santiago', 2),
+('Valparaíso', 2),
+('Concepción', 2),
+('La Serena', 2),
+('Antofagasta', 2),
+('Montevideo', 3),
+('Canelones', 3),
+('Maldonado', 3),
+('Rivera', 3),
+('Salto', 3),
+('Corrientes',1);
+
+INSERT INTO Localidad (Nombre, IdProvincia) VALUES
+-- Provincia 1: Buenos Aires
+('La Plata', 1),
+('Mar del Plata', 1),
+('Bahía Blanca', 1),
+
+-- Provincia 2: Córdoba
+('Córdoba Capital', 2),
+('Villa Carlos Paz', 2),
+('Río Cuarto', 2),
+
+-- Provincia 3: Santa Fe
+('Rosario', 3),
+('Santa Fe Capital', 3),
+('Rafaela', 3),
+
+-- Provincia 4: Mendoza
+('Mendoza Capital', 4),
+('San Rafael', 4),
+('Godoy Cruz', 4),
+
+-- Provincia 5: Salta
+('Salta Capital', 5),
+('San Ramón de la Nueva Orán', 5),
+('Tartagal', 5),
+
+-- Provincia 6: Santiago
+('Santiago de Chile', 6),
+('Maipú', 6),
+('Puente Alto', 6),
+
+-- Provincia 7: Valparaíso
+('Valparaíso', 7),
+('Viña del Mar', 7),
+('Quilpué', 7),
+
+-- Provincia 8: Concepción
+('Concepción', 8),
+('Talcahuano', 8),
+('Chiguayante', 8),
+
+-- Provincia 9: La Serena
+('La Serena', 9),
+('Coquimbo', 9),
+('Ovalle', 9),
+
+-- Provincia 10: Antofagasta
+('Antofagasta', 10),
+('Calama', 10),
+('Tocopilla', 10),
+
+-- Provincia 11: Montevideo
+('Montevideo', 11),
+('Sayago', 11),
+('Malvín', 11),
+
+-- Provincia 12: Canelones
+('Las Piedras', 12),
+('Ciudad de la Costa', 12),
+('Canelones', 12),
+
+-- Provincia 13: Maldonado
+('Maldonado', 13),
+('Punta del Este', 13),
+('San Carlos', 13),
+
+-- Provincia 14: Rivera
+('Rivera', 14),
+('Tranqueras', 14),
+('Minas de Corrales', 14),
+
+-- Provincia 15: Salto
+('Salto', 15),
+('Constitución', 15),
+('Belén', 15),
+
+('Tigre',1),
+('Pilar',1),
+('CABA',1),
+('Vicente Lopez',1);
+
+INSERT INTO Persona (Dni, Cuil, Nombre, Apellido, Sexo, IdPais, fechaNacimiento, Direccion, IdLocalidad, IdProvincia, Estado, CorreoElectronico)
+VALUES
+('00000000', '00-00000000-0', 'Banco', 'Group', 'Otro', 1, '1990-01-01', 'Lavalle 935', 1, 1, 'Activo', 'Banco.group@example.com'),
+
+('10000001', '20-10000001-3', 'Juan', 'Pérez', 'Masculino', 1, '1990-01-01', 'Calle Falsa 123', 1, 1, 'Activo', 'juan.perez@example.com'),
+('10000002', '27-10000002-4', 'Ana', 'Gómez', 'Femenino', 1, '1985-02-10', 'Av. Siempre Viva 456', 2, 1, 'Activo', 'ana.gomez@example.com'),
+('10000003', '23-10000003-5', 'Luis', 'Martínez', 'Masculino', 1, '1992-03-15', 'Mitre 789', 3, 1, 'Activo', 'luis.martinez@example.com'),
+
+('20000001', '20-20000001-6', 'Camila', 'Rodríguez', 'Femenino', 1, '1993-04-20', 'Alsina 321', 4, 2, 'Activo', 'camila.rodriguez@example.com'),
+('20000002', '27-20000002-7', 'Mariano', 'López', 'Masculino', 1, '1988-05-30', 'Belgrano 555', 5, 2, 'Activo', 'mariano.lopez@example.com'),
+
+('30000001', '20-30000001-8', 'Sofía', 'Fernández', 'Femenino', 2, '1994-06-25', 'Ruta 3 km 20', 14, 5, 'Activo', 'sofia.fernandez@example.com'),
+('30000002', '23-30000002-9', 'Pedro', 'Sánchez', 'Masculino', 2, '1990-07-14', 'Ruta 40 s/n', 15, 5, 'Activo', 'pedro.sanchez@example.com'),
+('30000003', '20-30000003-1', 'Laura', 'Díaz', 'Femenino', 2, '1987-08-08', 'Barrio Norte 77', 13, 5, 'Activo', 'laura.diaz@example.com'),
+
+('40000001', '20-40000001-2', 'Martín', 'Muñoz', 'Masculino', 2, '1991-09-09', 'Av. Chile 1000', 18, 6, 'Activo', 'martin.munoz@example.com'),
+('40000002', '23-40000002-3', 'Daniela', 'Castro', 'Femenino', 2, '1995-10-10', 'Calle Central 999', 16, 6, 'Activo', 'daniela.castro@example.com'),
+
+('50000001', '27-50000001-4', 'Valentina', 'Torres', 'Femenino', 3, '1992-11-11', 'La Rambla 300', 30, 10, 'Activo', 'valentina.torres@example.com'),
+('50000002', '20-50000002-5', 'Nicolás', 'Acosta', 'Masculino', 3, '1993-12-12', 'Montevideo 55', 31, 11, 'Activo', 'nicolas.acosta@example.com'),
+('50000003', '23-50000003-6', 'Lucía', 'Méndez', 'Femenino', 3, '1989-01-13', 'Las Piedras 888', 34, 12, 'Activo', 'lucia.mendez@example.com'),
+('50000004', '20-50000004-7', 'Sebastián', 'García', 'Masculino', 3, '1986-02-14', 'San Carlos 22', 39, 13, 'Activo', 'sebastian.garcia@example.com'),
+('50000005', '27-50000005-8', 'Carla', 'Rivas', 'Femenino', 3, '1990-03-15', 'Rivera Norte 100', 41, 14, 'Activo', 'carla.rivas@example.com');
+
+INSERT INTO usuarios (NombreUsuario, Contraseña, dni, TipoUsuario, Estado)
+VALUES
+
+('Banco', 'bank', '00000000', 1, 'Activo'),
+('juanpe', 'clave123', '10000001', 0, 'Activo'),
+('luism', 'clave123', '10000003', 0, 'Activo'),
+('camiro', 'clave123', '20000001', 0, 'Activo'),
+('marianol', 'clave123', '20000002', 0, 'Activo'),
+('sofiaf', 'clave123', '30000001', 0, 'Activo'),
+('pedros', 'clave123', '30000002', 0, 'Activo'),
+('laurad', 'clave123', '30000003', 0, 'Activo'),
+('martinm', 'clave123', '40000001', 0, 'Activo'),
+('danic', 'clave123', '40000002', 0, 'Activo'),
+('valentinat', 'clave123', '50000001', 0, 'Activo'),
+('nicolasa', 'clave123', '50000002', 0, 'Activo'),
+('luciam', 'clave123', '50000003', 0, 'Activo'),
+('sebastiang', 'clave123', '50000004', 0, 'Activo'),
+('carlar', 'clave123', '50000005', 0, 'Activo'),
+('adminUTN', 'admin123', '10000002', 1, 'Activo'); -- admin
+
+INSERT INTO TelefonoxPersonas (Dni, Telefono, Estado) VALUES
+('00000000','11223344','Activo'),
+('10000001', '1111111111','Activo'),
+('10000001', '1111111112','Activo'),
+('10000001', '1111111113','Activo'),
+
+('10000002', '2222222221','Activo'),
+('10000002', '2222222222','Activo'),
+('10000002', '2222222223','Activo'),
+
+-- 3 personas con 2 teléfonos
+('10000003', '3333333331','Activo'),
+('10000003', '3333333332','Activo'),
+
+('20000002', '4444444441','Activo'),
+('20000002', '4444444442','Activo'),
+
+('20000001', '5555555551','Activo'),
+('20000001', '5555555552','Activo'),
+
+-- Resto de personas con 1 teléfono
+('30000001', '6666666666','Activo'),
+('30000002', '7777777777','Activo'),
+('30000003', '8888888888','Activo'),
+('40000001', '9999999999','Activo'),
+('40000002', '1010101010','Activo'),
+('50000001', '1111111110','Activo'),
+('50000002', '1212121212','Activo'),
+('50000003', '1313131313','Activo'),
+('50000004', '1414141414','Activo'),
+('50000005', '1515151515','Activo');
+
+INSERT INTO Cuentas (IdUsuario, FechaCreacion, IdtipoCuenta, Cbu, Saldo, Estado) VALUES
+(1, '2023-01-15', 1, '00000000000000000000', 150000.00, 'Activa'),
+(11, '2023-01-15', 1, '00000000000000000001', 150000.00, 'Activa'),
+(2, '2023-02-12', 2, '00000000000000000002', 200000.00, 'Activa'),
+(3, '2023-03-10', 1, '00000000000000000003', 125000.50, 'Activa'),
+(4, '2023-04-01', 2, '00000000000000000004', 95000.75, 'Activa'),
+(5, '2023-05-20', 1, '00000000000000000005', 80000.00, 'Activa'),
+(6, '2023-06-15', 1, '00000000000000000006', 540000.00, 'Activa'),
+(7, '2023-07-18', 2, '00000000000000000007', 150000.00, 'Activa'),
+(8, '2023-08-22', 1, '00000000000000000008', 300500.00, 'Activa'),
+(9, '2023-09-01', 2, '00000000000000000009', 123000.00, 'Activa'),
+(10, '2023-10-05', 1, '00000000000000000010', 400000.00, 'Activa'),
+(12, '2023-07-18', 2, '00000000000000000011', 15000.00, 'Activa'),
+(13, '2023-08-22', 1, '00000000000000000012', 34500.00, 'Activa'),
+(14, '2023-09-01', 2, '00000000000000000013', 183000.00, 'Activa'),
+(15, '2023-10-05', 1, '00000000000000000014', 40300.00, 'Activa'),
+(4, '2025-06-05', 1, '00000000000000000015', 50400.00, 'Activa'),
+(5, '2025-07-01', 1, '00000000000000000016', 33000.90, 'Activa'),
+(6, '2025-09-10', 2, '00000000000000000017', 45000.00, 'Activa'),
+(7, '2025-01-20', 2, '00000000000000000018', 90000.00, 'Activa'),
+(8,'2025-05-30', 1, '00000000000000000019', 7100.00, 'Activa');
+
+INSERT INTO Prestamos (IdUsuario, Fecha, ImporteApagar, ImportePedido, PlazoDePago, MontoCuotasxMes, EstadoSolicitud, EstadoPago, IdCuenta) VALUES
+(4, '2024-01-10', 60000.00, 50000.00, '6 cuotas', 10000.00, 'Aprobado', 'En curso', 5),
+(2, '2024-03-15', 72000.00, 60000.00, '6 cuotas', 12000.00, 'Aprobado', 'En curso', 3),
+(3, '2024-05-01', 84000.00, 70000.00, '6 cuotas', 14000.00, 'Aprobado', 'En curso', 4),
+(5, '2024-01-10', 60000.00, 50000.00, '6 cuotas', 10000.00, 'Aprobado', 'En curso', 6),
+(6, '2024-03-15', 72000.00, 60000.00, '6 cuotas', 12000.00, 'Aprobado', 'En curso', 7),
+(7, '2024-05-01', 84000.00, 70000.00, '6 cuotas', 14000.00, 'Aprobado', 'En curso', 8),
+(8, '2024-01-10', 60000.00, 50000.00, '6 cuotas', 10000.00, 'Aprobado', 'En curso', 9),
+(9, '2024-03-15', 72000.00, 60000.00, '6 cuotas', 12000.00, 'Aprobado', 'En curso', 10),
+(10, '2024-05-01', 84000.00, 70000.00, '6 cuotas', 14000.00, 'Aprobado', 'En curso', 11);
+
+INSERT INTO Cuotas (NroCuota, Importe, FechaVencimiento, FechaPago, IdPrestamo, Estado) VALUES
+(1, 10000.00, '2024-02-10', '2024-02-10', 1,'Activo'),
+(2, 10000.00, '2024-03-10', '2024-03-10', 1,'Activo'),
+(3, 10000.00, '2024-04-10', '2024-04-10', 1,'Activo'),
+(4, 10000.00, '2024-05-10', NULL, 1,'Activo'),
+(5, 10000.00, '2024-06-10', NULL, 1,'Activo'),
+(6, 10000.00, '2024-07-10', NULL, 1,'Activo');
+
+-- Cuotas para préstamo 2 (IdPrestamo = 2)
+INSERT INTO Cuotas (NroCuota, Importe, FechaVencimiento, FechaPago, IdPrestamo, Estado) VALUES
+(1, 12000.00, '2024-04-15', '2024-04-15', 2,'Activo'),
+(2, 12000.00, '2024-05-15', '2024-05-15', 2,'Activo'),
+(3, 12000.00, '2024-06-15', NULL, 2,'Activo'),
+(4, 12000.00, '2024-07-15', NULL, 2,'Activo'),
+(5, 12000.00, '2024-08-15', NULL, 2,'Activo'),
+(6, 12000.00, '2024-09-15', NULL, 2,'Activo');
+
+-- Cuotas para préstamo 3 (IdPrestamo = 3)
+INSERT INTO Cuotas (NroCuota, Importe, FechaVencimiento, FechaPago, IdPrestamo, Estado) VALUES
+(1, 14000.00, '2024-06-01', NULL, 3,'Activo'),
+(2, 14000.00, '2024-07-01', NULL, 3,'Activo'),
+(3, 14000.00, '2024-08-01', NULL, 3,'Activo'),
+(4, 14000.00, '2024-09-01', NULL, 3,'Activo'),
+(5, 14000.00, '2024-10-01', NULL, 3,'Activo'),
+(6, 14000.00, '2024-11-01', NULL, 3,'Activo');
+INSERT INTO Cuotas (NroCuota, Importe, FechaVencimiento, FechaPago, IdPrestamo, Estado) VALUES
+(1, 10000.00, '2026-02-10', NULL, 4,'Activo'),
+(2, 10000.00, '2026-03-10', NULL, 4,'Activo'),
+(3, 10000.00, '2026-04-10', NULL, 4,'Activo'),
+(4, 10000.00, '2026-05-10', NULL, 4,'Activo'),
+(5, 10000.00, '2026-06-10', NULL, 4,'Activo'),
+(6, 10000.00, '2026-07-10', NULL, 4,'Activo');
+
+-- Cuotas para préstamo 5 (IdPrestamo = 5)
+INSERT INTO Cuotas (NroCuota, Importe, FechaVencimiento, FechaPago, IdPrestamo, Estado) VALUES
+(1, 12000.00, '2026-04-15', '2024-04-15', 5,'Activo'),
+(2, 12000.00, '2026-05-15', '2024-05-15', 5,'Activo'),
+(3, 12000.00, '2026-06-15', NULL, 5,'Activo'),
+(4, 12000.00, '2026-07-15', NULL, 5,'Activo'),
+(5, 12000.00, '2026-08-15', NULL, 5,'Activo'),
+(6, 12000.00, '2026-09-15', NULL, 5,'Activo');
+
+-- Cuotas para préstamo 6 (IdPrestamo = 6)
+INSERT INTO Cuotas (NroCuota, Importe, FechaVencimiento, FechaPago, IdPrestamo, Estado) VALUES
+(1, 14000.00, '2026-06-01', NULL, 6,'Activo'),
+(2, 14000.00, '2026-07-01', NULL, 6,'Activo'),
+(3, 14000.00, '2026-08-01', NULL, 6,'Activo'),
+(4, 14000.00, '2026-09-01', NULL, 6,'Activo'),
+(5, 14000.00, '2026-10-01', NULL, 6,'Activo'),
+(6, 14000.00, '2026-11-01', NULL, 6,'Activo');
+INSERT INTO Cuotas (NroCuota, Importe, FechaVencimiento, FechaPago, IdPrestamo, Estado) VALUES
+(1, 10000.00, '2026-02-10', '2024-02-10', 7,'Activo'),
+(2, 10000.00, '2026-03-10', NULL, 7,'Activo'),
+(3, 10000.00, '2026-04-10', NULL, 7,'Activo'),
+(4, 10000.00, '2026-05-10', NULL, 7,'Activo'),
+(5, 10000.00, '2026-06-10', NULL, 7,'Activo'),
+(6, 10000.00, '2026-07-10', NULL, 7,'Activo');
+
+-- Cuotas para préstamo 8 (IdPrestamo = 8)
+INSERT INTO Cuotas (NroCuota, Importe, FechaVencimiento, FechaPago, IdPrestamo, Estado) VALUES
+(1, 12000.00, '2026-04-15', '2024-04-15', 8,'Activo'),
+(2, 12000.00, '2026-05-15', NULL, 8,'Activo'),
+(3, 12000.00, '2026-06-15', NULL, 8,'Activo'),
+(4, 12000.00, '2026-07-15', NULL, 8,'Activo'),
+(5, 12000.00, '2026-08-15', NULL, 8,'Activo'),
+(6, 12000.00, '2026-09-15', NULL, 8,'Activo');
+
+-- Cuotas para préstamo 9 (IdPrestamo = 9)
+INSERT INTO Cuotas (NroCuota, Importe, FechaVencimiento, FechaPago, IdPrestamo, Estado) VALUES
+(1, 14000.00, '2026-06-01', NULL, 9,'Activo'),
+(2, 14000.00, '2026-07-01', NULL, 9,'Activo'),
+(3, 14000.00, '2026-08-01', NULL, 9,'Activo'),
+(4, 14000.00, '2026-09-01', NULL, 9,'Activo'),
+(5, 14000.00, '2026-10-01', NULL, 9,'Activo'),
+(6, 14000.00, '2026-11-01', NULL, 9,'Activo');
+
+INSERT INTO Movimientos (IdUsuario, IdTipoMovimiento, CuentaEmisor, Detalle, Importe, Fecha, CuentaReceptor,Estado) VALUES
+(4, 2, 5, 'Alta préstamo 1', 50000.00, '2024-01-10', 1,'Activo'),
+(4, 1, 5, 'Pago de cuota préstamo 1', 10000.00, '2024-02-10', 1,'Activo'),
+(4, 1, 5, 'Pago de cuota préstamo 2', 10000.00, '2024-03-10', 1,'Activo'),
+(4, 1, 5, 'Pago de cuota préstamo 3', 10000.00, '2024-04-10', 1,'Activo'),
+(2, 2, 3, 'Alta préstamo 2', 60000.00, '2024-03-15', 1,'Activo'),
+(2, 1, 3, 'Pago de cuota préstamo 1', 12000.00, '2024-04-15', 1,'Activo'),
+(2, 1, 3, 'Pago de cuota préstamo 2', 12000.00, '2024-05-15', 1,'Activo'),
+(3, 2, 4, 'Alta préstamo 3', 70000.00, '2024-05-01', 1,'Activo'),
+(3, 3, 4, 'Transferencia a cuenta 4', 5000.00, '2024-06-01', 4,'Activo'),
+(5, 3, 6, 'Transferencia a cuenta 3', 2000.00, '2024-06-02', 3,'Activo'),
+(5, 2, 6, 'Alta préstamo 4', 50000.00, '2024-01-10', 1,'Activo'),
+(6, 2, 7, 'Alta préstamo 5', 60000.00, '2024-03-15', 1,'Activo'),
+(6, 1, 7, 'Pago de cuota préstamo 1', 12000.00, '2025-02-10', 1,'Activo'),
+(6, 1, 7, 'Pago de cuota préstamo 2', 12000.00, '2025-02-10', 1,'Activo'),
+(7, 2, 8, 'Alta préstamo 6', 70000.00, '2024-05-01', 1,'Activo'),
+(8, 2, 9, 'Alta préstamo 7', 50000.00, '2024-01-10', 1,'Activo'),
+(8, 1, 9, 'Pago de cuota préstamo 1', 10000.00, '2025-02-10', 1,'Activo'),
+(9, 2, 10, 'Alta préstamo 8', 60000.00, '2024-03-15', 10,'Activo'),
+(9, 1, 10, 'Pago de cuota préstamo 1', 12000.00, '2024-02-10', 1,'Activo'),
+(10,2, 11, 'Alta préstamo 9', 70000.00, '2024-05-01', 1,'Activo');
+
+
